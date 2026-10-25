@@ -28,6 +28,7 @@ export default tseslint.config(
       'react/prop-types': 'off',
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'no-console': ['warn', { allow: ['warn', 'error'] }],
+      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
     },
   },
   prettier,
