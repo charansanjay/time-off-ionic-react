@@ -31,13 +31,17 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import '../theme/variables.css';
 import { AppRoutes } from './routes';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { queryClient } from './queryClient';
 
 setupIonicReact();
 
 export const App = () => (
-  <IonApp>
-    <IonReactRouter>
-      <AppRoutes />
-    </IonReactRouter>
-  </IonApp>
+  <QueryClientProvider client={queryClient}>
+    <IonApp>
+      <IonReactRouter>
+        <AppRoutes />
+      </IonReactRouter>
+    </IonApp>
+  </QueryClientProvider>
 );
