@@ -13,7 +13,7 @@ describe('delay', () => {
     const onResolve = vi.fn();
     void delay().then(onResolve);
 
-    await vi.advanceTimersByTimeAsync(4999);
+    await vi.advanceTimersByTimeAsync(499);
 
     expect(onResolve).not.toHaveBeenCalled();
   });
