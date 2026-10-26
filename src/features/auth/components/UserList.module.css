@@ -1,0 +1,14 @@
+ion-list.list:global(.list-inset) {
+  margin-top: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.item:hover {
+  --detail-icon-color: var(--ion-color-primary);
+  --detail-icon-opacity: 1;
+}
+
+.item:hover .icon {
+  color: var(--ion-color-primary);
+}

@@ -46,7 +46,7 @@ describe('readStorage', () => {
   });
 
   it('should reset to seed data when stored JSON is corrupt', () => {
-    localStorage.setItem(STORAGE_KEY, '{not valid json');
+    localStorage.setItem(STORAGE_KEY, 'not valid json');
 
     // Act
     const data = readStorage();
