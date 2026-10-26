@@ -1,3 +1,3 @@
-import { getDemoUsers, login } from '../../../mock-server/handlers/auth';
+import { getCurrentUser, getDemoUsers, login } from '../../../mock-server';
 
-export const authApi = { getDemoUsers, login };
+export const authApi = { getDemoUsers, login, getCurrentUser };

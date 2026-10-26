@@ -1,8 +1,8 @@
 import type { User } from '../../shared/types/user';
 import { SEED_USERS } from '../seed';
-import { readSession, SESSION_KEY } from '../session';
+import { readSession, SESSION_KEY, writeSession } from '../session';
 import { writeStorage } from '../storage';
-import { getDemoUsers, login } from './auth';
+import { getCurrentUser, getDemoUsers, login } from './auth';
 
 vi.mock('../simulate', () => ({ delay: () => Promise.resolve() }));
 
@@ -60,5 +60,47 @@ describe('login', () => {
     });
 
     await expect(login(employee.id)).rejects.toThrow('QuotaExceededError');
+  });
+});
+
+describe('getCurrentUser', () => {
+  const [employee] = SEED_USERS;
+
+  it('should return null when there is no session', async () => {
+    expect(await getCurrentUser()).toBeNull();
+  });
+
+  it('should return the user of the stored session', async () => {
+    writeSession({ userId: employee.id });
+
+    expect(await getCurrentUser()).toEqual(employee);
+  });
+
+  it('should return null when the session is corrupt', async () => {
+    localStorage.setItem(SESSION_KEY, '{not valid json');
+
+    expect(await getCurrentUser()).toBeNull();
+  });
+
+  it('should return null when the session user no longer exists', async () => {
+    writeSession({ userId: 'deleted-user' });
+
+    expect(await getCurrentUser()).toBeNull();
+  });
+
+  it('should clear the session when its user no longer exists', async () => {
+    writeSession({ userId: 'deleted-user' });
+
+    await getCurrentUser();
+
+    expect(localStorage.getItem(SESSION_KEY)).toBeNull();
+  });
+
+  it('should keep the session when its user exists', async () => {
+    writeSession({ userId: employee.id });
+
+    await getCurrentUser();
+
+    expect(readSession()).toEqual({ userId: employee.id });
   });
 });

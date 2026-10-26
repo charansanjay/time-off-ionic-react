@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../service/api';
+import { sessionKey } from '../../../shared/session/useCurrentUser';
 
 export const authKeys = {
-  session: ['session'],
   demoUsers: ['demo-users'],
 };
 
@@ -17,6 +17,6 @@ export const useLogin = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: authApi.login,
-    onSuccess: (user) => queryClient.setQueryData(authKeys.session, user),
+    onSuccess: (user) => queryClient.setQueryData(sessionKey, user),
   });
 };
