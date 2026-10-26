@@ -1,15 +1,43 @@
 import { IonRouterOutlet } from '@ionic/react';
 import { Navigate, Route } from 'react-router';
-import { RequestListPage } from '../features/requests/RequestListPage';
-import { LoginPage } from '../features/auth/LoginPage';
 import { NotFoundPage } from './NotFoundPage';
+import { RequestListPage } from '../features/requests/RequestListPage';
+import { RequireAuth } from './RequireAuth';
+import { RequirePermission } from './RequirePermission';
+import { LoginPage } from '../features/auth/LoginPage';
+import { NewRequestPage } from '../features/requests/NewRequestPage';
+import { RedirectIfLoggedIn } from './RedirectIfLoggedIn';
 
 export const AppRoutes = () => {
   return (
     <IonRouterOutlet>
       <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/requests" element={<RequestListPage />} />
+      <Route
+        path="/login"
+        element={
+          <RedirectIfLoggedIn>
+            <LoginPage />
+          </RedirectIfLoggedIn>
+        }
+      />
+      <Route
+        path="/requests"
+        element={
+          <RequireAuth>
+            <RequestListPage />
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/requests/new"
+        element={
+          <RequireAuth>
+            <RequirePermission permission="request:create">
+              <NewRequestPage />
+            </RequirePermission>
+          </RequireAuth>
+        }
+      />
       <Route path="*" element={<NotFoundPage />} />
     </IonRouterOutlet>
   );
