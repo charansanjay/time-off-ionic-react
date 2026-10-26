@@ -1,0 +1,9 @@
+.logoutAction {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.logoutAction ion-icon {
+  font-size: 1.5rem;
+}

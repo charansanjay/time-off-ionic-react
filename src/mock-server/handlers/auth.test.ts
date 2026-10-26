@@ -2,7 +2,7 @@ import type { User } from '../../shared/types/user';
 import { SEED_USERS } from '../seed';
 import { readSession, SESSION_KEY, writeSession } from '../session';
 import { writeStorage } from '../storage';
-import { getCurrentUser, getDemoUsers, login } from './auth';
+import { getCurrentUser, getDemoUsers, login, logout } from './auth';
 
 vi.mock('../simulate', () => ({ delay: () => Promise.resolve() }));
 
@@ -102,5 +102,15 @@ describe('getCurrentUser', () => {
     await getCurrentUser();
 
     expect(readSession()).toEqual({ userId: employee.id });
+  });
+});
+
+describe('logout', () => {
+  it('logout clears the session', async () => {
+    await login(SEED_USERS[0].id);
+    await logout();
+
+    expect(readSession()).toBeNull();
+    expect(await getCurrentUser()).toBeNull();
   });
 });

@@ -29,3 +29,8 @@ export const getCurrentUser = async (): Promise<User | null> => {
   }
   return user;
 };
+
+export const logout = async () => {
+  await delay();
+  clearSession();
+};

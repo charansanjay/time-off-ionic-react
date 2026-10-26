@@ -1,1 +1,1 @@
-export { getDemoUsers, login, getCurrentUser } from './handlers/auth';
+export { getDemoUsers, login, getCurrentUser, logout } from './handlers/auth';
