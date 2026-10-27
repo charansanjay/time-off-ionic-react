@@ -1,3 +1,4 @@
+import { ApiError } from '../../shared/api/ApiError';
 import { type User } from '../../shared/types/user';
 import { clearSession, readSession, writeSession } from '../session';
 import { delay } from '../simulate';
@@ -11,7 +12,7 @@ export const getDemoUsers = async (): Promise<User[]> => {
 export const login = async (userId: string): Promise<User> => {
   await delay();
   const user = readStorage().users.find((u) => u.id === userId);
-  if (!user) throw new Error('User not found');
+  if (!user) throw new ApiError('NOT_FOUND', 'User not found');
 
   writeSession({ userId: user.id });
   return user;

@@ -1,3 +1,4 @@
+import { ApiError } from '../../shared/api/ApiError';
 import type { User } from '../../shared/types/user';
 import { SEED_USERS } from '../seed';
 import { readSession, SESSION_KEY, writeSession } from '../session';
@@ -45,6 +46,8 @@ describe('login', () => {
 
   it('should reject with "User not found" when the id does not exist', async () => {
     await expect(login('does-not-exist')).rejects.toThrow('User not found');
+    await expect(login('unknown')).rejects.toBeInstanceOf(ApiError);
+    await expect(login('unknown')).rejects.toMatchObject({ code: 'NOT_FOUND' });
   });
 
   it('should not save a session when the user is not found', async () => {

@@ -1,5 +1,5 @@
 import { IonPage, IonContent, IonSpinner } from '@ionic/react';
-import styles from './PageLayout.module.css';
+import styles from './PageLoader.module.css';
 
 export const PageLoader = () => (
   <IonPage>
