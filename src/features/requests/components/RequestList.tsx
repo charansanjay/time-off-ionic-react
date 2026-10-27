@@ -1,8 +1,9 @@
 import { IonItem, IonLabel, IonList } from '@ionic/react';
-import { RequestCard } from './RequestCard';
-import type { RequestListItem } from '../../../shared/types/request';
 
 import styles from './RequestList.module.css';
+
+import type { RequestListItem } from '../../../shared/types/request';
+import { RequestCard } from './RequestCard';
 
 type RequestsListProps = {
   label: string;
