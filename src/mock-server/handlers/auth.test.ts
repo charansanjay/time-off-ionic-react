@@ -1,6 +1,6 @@
 import { ApiError } from '../../shared/api/ApiError';
 import type { User } from '../../shared/types/user';
-import { SEED_USERS } from '../seed';
+import { SEED_REQUESTS, SEED_USERS } from '../seed';
 import { readSession, SESSION_KEY, writeSession } from '../session';
 import { writeStorage } from '../storage';
 import { getCurrentUser, getDemoUsers, login, logout } from './auth';
@@ -23,7 +23,21 @@ describe('getDemoUsers', () => {
 
   it('should return the users that are stored', async () => {
     const mockUsers: User[] = [{ id: 'u1', name: 'Test', role: 'employee' }];
-    writeStorage({ users: mockUsers });
+    writeStorage({
+      users: mockUsers,
+      requests: [
+        {
+          id: 'req-1',
+          employeeId: 'u1',
+          startDate: '2026-11-20',
+          endDate: '2026-11-28',
+          type: 'vacation',
+          note: 'Family trip',
+          status: 'pending',
+          createdAt: '2026-10-25T10:00:00.000Z',
+        },
+      ],
+    });
 
     expect(await getDemoUsers()).toEqual(mockUsers);
   });
@@ -57,7 +71,7 @@ describe('login', () => {
   });
 
   it('should reject when the session cannot be saved', async () => {
-    writeStorage({ users: SEED_USERS });
+    writeStorage({ users: SEED_USERS, requests: SEED_REQUESTS });
     vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
       throw new Error('QuotaExceededError');
     });

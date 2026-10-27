@@ -1,8 +1,9 @@
-import { SEED_USERS } from './seed';
+import { SEED_REQUESTS, SEED_USERS } from './seed';
 import { resetStorage, STORAGE_KEY, writeStorage, readStorage, type StorageData } from './storage';
 
 const storageData: StorageData = {
   users: SEED_USERS,
+  requests: SEED_REQUESTS,
 };
 
 beforeEach(() => {
@@ -36,7 +37,21 @@ describe('readStorage', () => {
 
   it('should return stored data when it is valid', () => {
     //Arrange
-    const userData: StorageData = { users: [{ id: 'u1', name: 'Test', role: 'employee' }] };
+    const userData: StorageData = {
+      users: [{ id: 'u1', name: 'Test', role: 'employee' }],
+      requests: [
+        {
+          id: 'req-1',
+          employeeId: 'u1',
+          startDate: '2026-11-20',
+          endDate: '2026-11-28',
+          type: 'vacation',
+          note: 'Family trip',
+          status: 'pending',
+          createdAt: '2026-10-25T10:00:00.000Z',
+        },
+      ],
+    };
     writeStorage(userData);
 
     // Act
@@ -61,6 +76,8 @@ describe('readStorage', () => {
     ['users that is not an array', { users: 'nope' }],
     ['null', null],
     ['a plain string', 'hello'],
+    ['data saved before requests existed', { users: [] }],
+    ['requests that is not an array', { users: [], requests: 'nope' }],
   ])('should reset to seed data when stored value is %s', (_label, invalidValue) => {
     // Arrange
     localStorage.setItem(STORAGE_KEY, JSON.stringify(invalidValue));

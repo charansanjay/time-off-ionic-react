@@ -1,0 +1,8 @@
+.segment {
+  width: 100%;
+}
+
+.segment ion-segment-button {
+  flex: 1;
+  max-width: none;
+}

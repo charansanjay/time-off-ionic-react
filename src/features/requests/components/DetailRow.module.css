@@ -1,0 +1,28 @@
+.row {
+  display: flex;
+  align-items: flex-start; /* a long note wraps; the icon stays on the first line */
+  gap: 12px;
+}
+
+.row dt {
+  display: flex;
+  font-size: 1.25rem;
+  color: var(--ion-color-primary);
+}
+
+.row dd {
+  margin: 0;
+  line-height: 1.25rem;
+  min-width: 0; /* lets the text shrink inside the flex row */
+  overflow-wrap: anywhere; /* breaks very long words or URLs */
+  white-space: pre-line; /* keeps the line breaks the user typed */
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.meta dt {
+  color: var(--ion-color-medium);
+}
