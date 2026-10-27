@@ -11,8 +11,9 @@ import {
 import { logOutOutline, personCircleOutline } from 'ionicons/icons';
 
 import styles from './CurrentUser.module.css';
+
 import { useCurrentUser } from './useCurrentUser';
-import { useLogout } from '../../features/auth/hooks/queries';
+import { useLogout } from './useLogout';
 
 export const CurrentUser = () => {
   const { data: user } = useCurrentUser();
@@ -48,8 +49,8 @@ export const CurrentUser = () => {
               onClick={() => logout.mutate()}
             >
               <div className={styles.logoutAction}>
-                <IonIcon slot="start" icon={logOutOutline} aria-hidden="true" color="primary" />
-                <IonLabel>Log Out</IonLabel>
+                <IonIcon icon={logOutOutline} aria-hidden="true" color="primary" />
+                <IonLabel>Log out</IonLabel>
               </div>
             </IonItem>
           </IonList>

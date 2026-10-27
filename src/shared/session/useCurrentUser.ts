@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { sessionApi } from './api';
 
-export const sessionKey = ['session'];
+export const sessionKey = ['session'] as const;
 
 export const useCurrentUser = () => {
   return useQuery({

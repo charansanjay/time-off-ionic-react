@@ -46,7 +46,7 @@ export const LoginPage = () => {
 
         {demoUsers.isError && (
           <ErrorState
-            message="We couldn't load the Demo users."
+            message="We couldn't load the demo users."
             onRetry={() => demoUsers.refetch()}
           />
         )}

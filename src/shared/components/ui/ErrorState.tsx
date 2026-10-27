@@ -1,5 +1,5 @@
 import { IonButton, IonText } from '@ionic/react';
-import styles from './LoadError.module.css';
+import styles from './ErrorState.module.css';
 
 type LoadErrorProps = {
   message: string;
