@@ -1,5 +1,5 @@
 import { add } from 'ionicons/icons';
-import { IonButton, IonIcon, IonLabel, IonSegment, IonSegmentButton } from '@ionic/react';
+import { IonButton, IonIcon } from '@ionic/react';
 
 import { AppPage } from '../../shared/components/layout/AppPage';
 import { ErrorState } from '../../shared/components/ui/ErrorState';
@@ -12,8 +12,7 @@ import { EmptyState } from '../../shared/components/ui/EmptyState';
 import { RequestList } from './components/RequestList';
 import { groupRequests } from './rules/groupRequests';
 import { useState } from 'react';
-
-import styles from './RequestListPage.module.css';
+import { RequestViewSwitch } from './components/RequestViewSwitch';
 
 type RequestView = 'upcoming' | 'past';
 
@@ -27,29 +26,12 @@ export const RequestListPage = () => {
   const showEmployeeName = can(user, 'request:read:all');
   const requestGroups = requests.isSuccess ? groupRequests(requests.data) : null;
 
-  const segment = (
-    <IonSegment
-      value={view}
-      onIonChange={(event) => setView(event.detail.value as RequestView)}
-      aria-label="Show requests"
-      className={styles.segment}
-    >
-      <IonSegmentButton value="upcoming">
-        <IonLabel>Upcoming{requestGroups && ` (${requestGroups.upcoming.length})`}</IonLabel>
-      </IonSegmentButton>
-      <IonSegmentButton value="past">
-        <IonLabel>Past{requestGroups && ` (${requestGroups.past.length})`}</IonLabel>
-      </IonSegmentButton>
-    </IonSegment>
-  );
+  const counts = requestGroups
+    ? { upcoming: requestGroups.upcoming.length, past: requestGroups.past.length }
+    : undefined;
 
-  const footer = can(user, 'request:create') ? (
-    <IonButton
-      expand="block"
-      routerLink="/requests/new"
-      className="ion-margin-horizontal"
-      aria-label="New request"
-    >
+  const footer = canCreate ? (
+    <IonButton expand="block" routerLink="/requests/new" className="ion-margin-horizontal">
       <IonIcon slot="start" icon={add} aria-hidden="true" />
       Request time off
     </IonButton>
@@ -59,7 +41,7 @@ export const RequestListPage = () => {
     <AppPage
       title={'Time-Off Requests'}
       actions={<CurrentUser />}
-      subheader={segment}
+      subheader={<RequestViewSwitch value={view} onChange={setView} counts={counts} />}
       footer={footer}
     >
       {requests.isPending && <RequestListSkeleton />}
@@ -72,7 +54,9 @@ export const RequestListPage = () => {
         <EmptyState
           title="No requests yet"
           message={
-            canCreate ? 'Tap + to request time off.' : 'Requests from your team will appear here.'
+            canCreate
+              ? 'Your requests will appear here.'
+              : 'Requests from your team will appear here.'
           }
         />
       )}
