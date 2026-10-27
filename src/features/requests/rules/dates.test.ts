@@ -1,4 +1,4 @@
-import { countWorkingDays, formatDateRange } from './dates';
+import { countWorkingDays, formatDateRange, formatDateTime } from './dates';
 
 describe('countWorkingDays', () => {
   it.each([
@@ -18,5 +18,11 @@ describe('formatDateRange', () => {
   });
   it('shows start – end for a range', () => {
     expect(formatDateRange('2026-11-02', '2026-11-06')).toBe('Mon 2 Nov – Fri 6 Nov');
+  });
+});
+
+describe('formatDateTime', () => {
+  it('formats a moment as date and time', () => {
+    expect(formatDateTime('2026-10-01T10:00:00')).toBe('1 Oct 2026, 10:00');
   });
 });

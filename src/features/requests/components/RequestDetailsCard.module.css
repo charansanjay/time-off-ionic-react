@@ -1,0 +1,27 @@
+.card {
+  margin-inline: 16px;
+  color: var(--ion-text-color);
+}
+
+.body {
+  padding: 16px;
+}
+
+.name {
+  margin: 12px 0 0;
+  font-size: 1.375rem;
+  font-weight: 700;
+}
+
+.facts {
+  margin: 16px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .card {
+    margin-inline: 0;
+  }
+}

@@ -20,6 +20,7 @@ export type TimeOffRequest = {
 };
 
 export type RequestListItem = TimeOffRequest & { employeeName: string };
+export type RequestDetails = RequestListItem & { decidedByName?: string };
 
 export const TYPE_LABELS: Record<TimeOffType, string> = {
   vacation: 'Vacation',

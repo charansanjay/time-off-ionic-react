@@ -7,6 +7,7 @@ import { RequirePermission } from './RequirePermission';
 import { LoginPage } from '../features/auth/LoginPage';
 import { NewRequestPage } from '../features/requests/NewRequestPage';
 import { RedirectIfLoggedIn } from './RedirectIfLoggedIn';
+import { RequestDetailsPage } from '../features/requests/RequestDetailsPage';
 
 export const AppRoutes = () => {
   return (
@@ -35,6 +36,14 @@ export const AppRoutes = () => {
             <RequirePermission permission="request:create">
               <NewRequestPage />
             </RequirePermission>
+          </RequireAuth>
+        }
+      />
+      <Route
+        path="/requests/:id"
+        element={
+          <RequireAuth>
+            <RequestDetailsPage />
           </RequireAuth>
         }
       />

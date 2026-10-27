@@ -13,3 +13,7 @@ export const formatDateRange = (startDate: string, endDate: string) => {
   if (startDate === endDate) return start;
   return `${start} – ${format(parseISO(endDate), 'EEE d MMM')}`;
 };
+
+// "1 Oct 2026, 10:00" in the user's local time (for moments like createdAt)
+export const formatDateTime = (isoMoment: string) =>
+  format(parseISO(isoMoment), 'd MMM yyyy, HH:mm');
