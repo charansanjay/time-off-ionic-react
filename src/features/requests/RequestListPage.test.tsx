@@ -139,7 +139,7 @@ describe('RequestListPage', () => {
     expect(screen.getByText('Pending')).toBeInTheDocument();
 
     expect(screen.queryByText('Eva Employee')).not.toBeInTheDocument();
-    expect(screen.getByLabelText('New request')).toBeInTheDocument();
+    expect(screen.getByText('Request time off')).toBeInTheDocument();
   });
 
   it('shows the supervisor employee names, without the new request button', async () => {
@@ -149,7 +149,7 @@ describe('RequestListPage', () => {
     renderPage();
 
     expect(await screen.findByText('Eva Employee')).toBeInTheDocument();
-    expect(screen.queryByLabelText('New request')).not.toBeInTheDocument();
+    expect(screen.queryByText('Request time off')).not.toBeInTheDocument();
   });
 
   // ── Upcoming and past ────────────────────────────────────────────────────────────
