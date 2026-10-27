@@ -1,0 +1,29 @@
+.subHeader {
+  margin-top: 4px;
+  max-width: 640px;
+  margin-inline: auto;
+  --background: transparent;
+}
+
+.container {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.footerToolbar {
+  --background: transparent;
+}
+
+.footerContent {
+  padding-inline: 16px;
+}
+
+.footerContent ion-button {
+  margin-inline: 0;
+}
+
+@media (min-width: 640px) {
+  .footerContent {
+    padding-inline: 0;
+  }
+}
