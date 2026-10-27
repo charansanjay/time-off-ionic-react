@@ -18,3 +18,17 @@ export type TimeOffRequest = {
   createdAt: string;
   decision?: Decision;
 };
+
+export type RequestListItem = TimeOffRequest & { employeeName: string };
+
+export const TYPE_LABELS: Record<TimeOffType, string> = {
+  vacation: 'Vacation',
+  sick: 'Sick leave',
+  personal: 'Personal',
+};
+
+export const STATUS_LABELS: Record<TimeOffStatus, string> = {
+  pending: 'Pending',
+  approved: 'Approved',
+  rejected: 'Rejected',
+};

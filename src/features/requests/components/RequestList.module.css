@@ -1,0 +1,5 @@
+@media (min-width: 640px) {
+  ion-list.list:global(.list-inset) {
+    margin-inline: 0;
+  }
+}
