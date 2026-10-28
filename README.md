@@ -9,19 +9,22 @@ Built in small steps, like a team project: **GitHub issues** (epics and stories 
 ## Contents
 
 - [Try it](#try-it)
-- [Features](#features)
 - [Getting started](#getting-started)
+- [Features](#features)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
 - [Testing](#testing)
-- [Quality (non-functional requirements)](#quality-non-functional-requirements)
+- [Quality checks](#quality-checks)
 - [Assumptions](#assumptions)
 - [Not built and next steps](#not-built-and-next-steps)
 - [Use of AI](#use-of-ai)
 
 ## Try it
 
-No password: tap a demo user on the login screen.
+- **Best on a real phone:** open the live demo on your phone to see the native date pickers, action sheets and iOS / Android styling.
+- **On a computer:** use the browser's device mode. Ionic picks the iOS or Material style from the device (reload after switching, or add `?ionic:mode=ios` / `?ionic:mode=md` to the URL).
+
+**No password:** tap a demo user on the login screen.
 
 | User          | Role       | Try                                             |
 | ------------- | ---------- | ----------------------------------------------- |
@@ -33,7 +36,26 @@ No password: tap a demo user on the login screen.
 - **Check the access rules:** as **Charan**, open `/requests/req-5` (one of Jana's requests) in the address bar → **Request not found**.
 - **Demo data** (under the user list): **Reset sample data** brings the sample requests back; **Start empty** removes all requests so you can start from scratch. Data lives in your browser's localStorage.
 - Every call to the mock server waits **500 ms**, so the loading states are visible.
-- Best viewed in the browser's device mode. Ionic picks the iOS or Material style from the device; reload after switching device, or add `?ionic:mode=ios` / `?ionic:mode=md` to the URL.
+
+## Getting started
+
+**Requirements:** Node.js 24 (see `.nvmrc`) and npm.
+
+```bash
+npm install
+npm run dev
+```
+
+Open the URL Vite prints, and switch the browser to device mode for the mobile view.
+
+| Script          | What it does                                |
+| --------------- | ------------------------------------------- |
+| `npm run dev`   | Start the development server                |
+| `npm run build` | Type-check and build for production         |
+| `npm test`      | Run the tests                               |
+| `npm run check` | Format, lint, type-check and test in one go |
+
+All scripts are in `package.json`. **CI (GitHub Actions)** runs lint, format check, type-check, tests and build on every push and pull request. Husky runs lint-staged and commitlint (conventional commits) before each commit.
 
 ## Features
 
@@ -55,26 +77,6 @@ No password: tap a demo user on the login screen.
 - **Light and dark mode**, following the device setting, with custom theme colours for both.
 - **Responsive:** phone, tablet and desktop (a centred column on wide screens).
 - Loading, empty and error states on every screen.
-
-## Getting started
-
-**Requirements:** Node.js 24 (see `.nvmrc`) and npm.
-
-```bash
-npm install
-npm run dev
-```
-
-Open the URL Vite prints, and switch the browser to device mode for the mobile view.
-
-| Script          | What it does                                |
-| --------------- | ------------------------------------------- |
-| `npm run dev`   | Start the development server                |
-| `npm run build` | Type-check and build for production         |
-| `npm test`      | Run the tests                               |
-| `npm run check` | Format, lint, type-check and test in one go |
-
-All scripts are in `package.json`. **CI (GitHub Actions)** runs lint, format check, type-check, tests and build on every push and pull request. Husky runs lint-staged and commitlint (conventional commits) before each commit.
 
 ## Tech stack
 
@@ -117,13 +119,13 @@ Each layer is tested at its own level:
 
 Some Ionic components don't fire their events in jsdom; those tests replace only the affected components or hooks with small fakes that keep the same contract (documented in each test file).
 
-## Quality (non-functional requirements)
+## Quality checks
 
 | Area                   | What's in place                                                                                                                                                                                                          |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Security**           | The mock server identifies the caller from the session, never from client data; **role-based access** checked on every call; Zod validation on every write; someone else's request answers "not found".                  |
 | **Performance**        | Lighthouse, live site, mobile (Moto G Power, slow 4G): **Performance 89**, FCP 2.8 s, LCP 2.8 s, TBT 160 ms, CLS 0.006. Main bundle 336 kB gzipped, mostly Ionic's components. Cached data makes back navigation instant |
-| **Accessibility**      | **Lighthouse Accessibility score - 100**; axe (WCAG 2.1 AA)                                                                                                                                                              |
+| **Accessibility**      | **Lighthouse Accessibility 100**; axe (WCAG 2.1 AA)                                                                                                                                                                      |
 | **Reliability**        | Loading, empty and error states with retry on every screen; double submits prevented; concurrent decisions handled (`CONFLICT`, then the real decision is shown)                                                         |
 | **Testing**            | 128 tests; coverage **96% of lines, 91% of branches** (Vitest, v8)                                                                                                                                                       |
 | **Best practices**     | **Lighthouse Best Practices 100**; TypeScript strict mode, no `any` (enforced by ESLint), ESLint with accessibility rules, Prettier                                                                                      |
