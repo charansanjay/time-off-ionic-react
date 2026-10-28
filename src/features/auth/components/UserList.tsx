@@ -1,8 +1,9 @@
-import { IonList, IonLabel, IonItem, IonIcon, IonSpinner, IonText } from '@ionic/react';
+import { IonList, IonLabel, IonItem, IonIcon, IonSpinner } from '@ionic/react';
 import { personCircleOutline } from 'ionicons/icons';
 import type { User } from '../../../shared/types/user';
 
 import styles from './UserList.module.css';
+import { RoleLabel } from '../../../shared/components/ui/RoleLabel';
 
 type UserListProps = {
   demoUsers: User[];
@@ -36,9 +37,9 @@ export const UserList = ({ demoUsers, disabled, onLogin, loggingInUserId }: User
 
             <IonLabel>
               <h2>{user.name}</h2>
-              <IonText color={user.role === 'supervisor' ? 'tertiary' : 'warning'}>
-                {user.role}
-              </IonText>
+              <p>
+                <RoleLabel role={user.role} />
+              </p>
             </IonLabel>
             {isLoggingIn && (
               <IonSpinner slot="end" name="crescent" aria-label="Logging in" color="primary" />
