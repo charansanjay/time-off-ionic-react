@@ -1,4 +1,6 @@
-export type TimeOffType = 'vacation' | 'sick' | 'personal';
+export const TIME_OFF_TYPES = ['vacation', 'sick', 'personal'] as const;
+
+export type TimeOffType = (typeof TIME_OFF_TYPES)[number];
 export type TimeOffStatus = 'pending' | 'approved' | 'rejected';
 
 export type Decision = {

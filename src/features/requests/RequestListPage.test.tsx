@@ -7,7 +7,7 @@ import type { User } from '../../shared/types/user';
 import { useCurrentUser } from '../../shared/session/useCurrentUser';
 import { renderWithProviders } from '../../test/renderWithProviders';
 import { RequestListPage } from './RequestListPage';
-import { formatDateRange } from './rules/dates';
+import { formatDateRange } from '../../shared/utils/dates';
 import { requestApi } from './service/api';
 
 // ── Mocks: who is logged in, and what the "server" answers ─────────────────────────
