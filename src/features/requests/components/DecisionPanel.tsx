@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { IonButton, IonCard, IonTextarea, useIonAlert, useIonToast } from '@ionic/react';
+import {
+  IonButton,
+  IonCard,
+  IonSpinner,
+  IonTextarea,
+  useIonAlert,
+  useIonToast,
+} from '@ionic/react';
 
 import styles from './DecisionPanel.module.css';
 import { useDecideRequest } from '../hooks/queries';
@@ -63,6 +70,8 @@ export const DecisionPanel = ({ requestId }: DecisionPanelProps) => {
     });
   };
 
+  const deciding = decide.isPending ? decide.variables?.status : undefined;
+
   return (
     <IonCard className={styles.card}>
       <div className={styles.body}>
@@ -85,18 +94,25 @@ export const DecisionPanel = ({ requestId }: DecisionPanelProps) => {
           <IonButton
             color="danger"
             fill="outline"
-            disabled={decide.isPending}
             onClick={() => confirmDecision('rejected')}
+            disabled={decide.isPending}
           >
-            Reject
+            {deciding === 'rejected' ? (
+              <IonSpinner name="crescent" aria-label="Rejecting" />
+            ) : (
+              'Reject'
+            )}
           </IonButton>
-
           <IonButton
             color="success"
-            disabled={decide.isPending}
             onClick={() => confirmDecision('approved')}
+            disabled={decide.isPending}
           >
-            Approve
+            {deciding === 'approved' ? (
+              <IonSpinner name="crescent" aria-label="Approving" />
+            ) : (
+              'Approve'
+            )}
           </IonButton>
         </div>
       </div>
