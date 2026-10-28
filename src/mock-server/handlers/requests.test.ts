@@ -1,6 +1,7 @@
 import { SEED_REQUESTS } from '../seed';
+import { readStorage } from '../storage';
 import { login } from './auth';
-import { getTimeOffRequest, getTimeOffRequests } from './requests';
+import { decideRequest, getTimeOffRequest, getTimeOffRequests } from './requests';
 
 vi.mock('../simulate', () => ({ delay: () => Promise.resolve() }));
 
@@ -66,5 +67,57 @@ describe('getTimeOffRequest', () => {
 
   it('rejects when nobody is logged in', async () => {
     await expect(getTimeOffRequest('req-1')).rejects.toMatchObject({ code: 'UNAUTHENTICATED' });
+  });
+});
+
+describe('decideRequest', () => {
+  it('approves a pending request and saves who decided and when', async () => {
+    await login('user-supervisor-1');
+
+    const result = await decideRequest('req-1', { status: 'approved', note: '  Enjoy!  ' });
+
+    expect(result.status).toBe('approved');
+    expect(result.decision).toMatchObject({ decidedBy: 'user-supervisor-1', note: 'Enjoy!' });
+    expect(result.decidedByName).toBe('Petr Dvořák');
+
+    // The side effect: it's really saved
+    const saved = readStorage().requests.find((r) => r.id === 'req-1');
+    expect(saved?.status).toBe('approved');
+  });
+
+  it('rejects a request and stores no note when the note is blank', async () => {
+    await login('user-supervisor-1');
+
+    const result = await decideRequest('req-5', { status: 'rejected', note: '   ' });
+
+    expect(result.status).toBe('rejected');
+    expect(result.decision?.note).toBeUndefined();
+  });
+
+  it('refuses a request that was already decided', async () => {
+    await login('user-supervisor-1');
+    await expect(decideRequest('req-2', { status: 'rejected' })).rejects.toMatchObject({
+      code: 'CONFLICT',
+    });
+  });
+
+  it('refuses an employee', async () => {
+    await login('user-employee-1');
+    await expect(decideRequest('req-5', { status: 'approved' })).rejects.toMatchObject({
+      code: 'FORBIDDEN',
+    });
+  });
+
+  it('rejects an id that does not exist', async () => {
+    await login('user-supervisor-1');
+    await expect(decideRequest('req-999', { status: 'approved' })).rejects.toMatchObject({
+      code: 'NOT_FOUND',
+    });
+  });
+
+  it('rejects when nobody is logged in', async () => {
+    await expect(decideRequest('req-1', { status: 'approved' })).rejects.toMatchObject({
+      code: 'UNAUTHENTICATED',
+    });
   });
 });
