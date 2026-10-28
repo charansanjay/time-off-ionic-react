@@ -1,5 +1,6 @@
 import { ApiError } from '../../shared/api/ApiError';
 import { can } from '../../shared/permissions';
+import { newRequestSchema, type NewRequestInput } from '../../shared/schema/newRequestSchema';
 import type {
   DecisionInput,
   RequestDetails,
@@ -92,4 +93,48 @@ export const decideRequest = async (id: string, input: DecisionInput): Promise<R
   });
 
   return toDetails(data.users, decided);
+};
+
+const overlaps = (a: TimeOffRequest, startDate: string, endDate: string) =>
+  a.startDate <= endDate && startDate <= a.endDate;
+
+export const createRequest = async (input: NewRequestInput) => {
+  await delay();
+  const data = readStorage();
+  const user = requireUser(data.users);
+
+  if (!can(user, 'request:create')) {
+    throw new ApiError('FORBIDDEN', 'Not allowed to create requests');
+  }
+
+  // Validate the input
+  const parsed = newRequestSchema.safeParse(input);
+  if (!parsed.success) {
+    throw new ApiError('VALIDATION', parsed.error.issues[0]?.message ?? 'Invalid request');
+  }
+
+  const { type, startDate, endDate, note } = parsed.data;
+
+  // Rejected requests don't block: the employee may ask for the same days again.
+  const clash = data.requests.some(
+    (r) => r.employeeId === user.id && r.status !== 'rejected' && overlaps(r, startDate, endDate),
+  );
+  if (clash) {
+    throw new ApiError('CONFLICT', 'You already have time off on some of these days');
+  }
+
+  const request: TimeOffRequest = {
+    id: crypto.randomUUID(),
+    employeeId: user.id, // from the session, never from the client
+    type,
+    startDate,
+    endDate,
+    note,
+    status: 'pending',
+    createdAt: new Date().toISOString(),
+  };
+
+  writeStorage({ ...data, requests: [...data.requests, request] });
+
+  return toDetails(data.users, request);
 };

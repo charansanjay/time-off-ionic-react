@@ -1,5 +1,5 @@
 import { IonItem, IonLabel } from '@ionic/react';
-import { countWorkingDays, formatDateRange } from '../rules/dates';
+import { countWorkingDays, formatDateRange } from '../../../shared/utils/dates';
 import { TYPE_LABELS, type RequestListItem } from '../../../shared/types/request';
 import { StatusBadge } from '../../../shared/components/ui/StatusBadge';
 
