@@ -22,6 +22,9 @@ export type TimeOffRequest = {
 export type RequestListItem = TimeOffRequest & { employeeName: string };
 export type RequestDetails = RequestListItem & { decidedByName?: string };
 
+export type DecisionStatus = Exclude<TimeOffStatus, 'pending'>;
+export type DecisionInput = { status: DecisionStatus; note?: string };
+
 export const TYPE_LABELS: Record<TimeOffType, string> = {
   vacation: 'Vacation',
   sick: 'Sick leave',

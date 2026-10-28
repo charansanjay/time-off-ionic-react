@@ -9,6 +9,7 @@ import { ErrorState } from '../../shared/components/ui/ErrorState';
 import { EmptyState } from '../../shared/components/ui/EmptyState';
 import { RequestDetailsSkeleton } from './components/RequestDetailsSkeleton';
 import { ApiError } from '../../shared/api/ApiError';
+import { DecisionPanel } from './components/DecisionPanel';
 
 export const RequestDetailsPage = () => {
   const { id = '' } = useParams<{ id: string }>();
@@ -33,10 +34,15 @@ export const RequestDetailsPage = () => {
       )}
 
       {request.isSuccess && (
-        <RequestDetailsCard
-          request={request.data}
-          showEmployeeName={can(user, 'request:read:all')}
-        />
+        <>
+          <RequestDetailsCard
+            request={request.data}
+            showEmployeeName={can(user, 'request:read:all')}
+          />
+          {can(user, 'request:decide') && request.data.status === 'pending' && (
+            <DecisionPanel requestId={request.data.id} />
+          )}
+        </>
       )}
     </AppPage>
   );

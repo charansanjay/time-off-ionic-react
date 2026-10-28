@@ -1,0 +1,31 @@
+.card {
+  margin-inline: 0;
+  color: var(--ion-text-color);
+}
+
+.body {
+  padding: 16px;
+}
+
+.heading {
+  margin: 0 0 16px;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.actions ion-button {
+  flex: 1;
+  margin: 0;
+}
+
+@media (min-width: 640px) {
+  .card {
+    margin-inline: 0;
+  }
+}

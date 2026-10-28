@@ -1,3 +1,3 @@
-import { getTimeOffRequest, getTimeOffRequests } from '../../../mock-server';
+import { getTimeOffRequest, getTimeOffRequests, decideRequest } from '../../../mock-server';
 
-export const requestApi = { getTimeOffRequest, getTimeOffRequests };
+export const requestApi = { getTimeOffRequest, getTimeOffRequests, decideRequest };
