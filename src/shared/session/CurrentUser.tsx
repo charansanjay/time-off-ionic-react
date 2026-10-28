@@ -14,6 +14,7 @@ import styles from './CurrentUser.module.css';
 
 import { useCurrentUser } from './useCurrentUser';
 import { useLogout } from './useLogout';
+import { RoleLabel } from '../components/ui/RoleLabel';
 
 export const CurrentUser = () => {
   const { data: user } = useCurrentUser();
@@ -39,7 +40,7 @@ export const CurrentUser = () => {
             <IonItem lines="full">
               <IonLabel>
                 <h2>{user.name}</h2>
-                <p>{user.role}</p>
+                <RoleLabel role={user.role} />
               </IonLabel>
             </IonItem>
             <IonItem

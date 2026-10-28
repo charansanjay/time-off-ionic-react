@@ -21,3 +21,7 @@ export const useLogin = () => {
     onSuccess: (user) => queryClient.setQueryData(sessionKey, user),
   });
 };
+
+export const useResetDemoData = () => {
+  return useMutation({ mutationFn: authApi.resetDemoData });
+};
