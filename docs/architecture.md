@@ -1,6 +1,6 @@
 # Architecture Overview
 
-This document describes how the app is organised and why.
+This document explains how the app is organised and how data flows through it.
 
 ## Contents
 
@@ -11,91 +11,133 @@ This document describes how the app is organised and why.
 - [Mock server](#mock-server)
 - [Screens](#screens)
 - [Cross-cutting concerns](#cross-cutting-concerns)
-- [Key decisions and trade-offs](#key-decisions-and-trade-offs)
 
 ## Approach
 
-- **Feature-based folders:** each feature owns its API calls, queries, types, rules, components and pages.
-- **One direction of imports:** `app` → `features` → `shared`. Features never import from each other or from `app`.
-- **One set of screens for both roles:** the request list and details are shared; permissions decide what each role sees and can do.
+- **Feature-based folders:** each feature owns its pages, components, query hooks, API calls and rules.
+- **One direction of imports:** `app` → `features` → `shared`. Features don't import from each other; `shared` never imports from a feature; only each feature's `service/api.ts` talks to the mock server.
+- **One set of screens for both roles:** the request list and details are shared; a permissions config decides what each role sees and can do.
 
 ## Folder structure
 
 ```text
 src/
-├── main.tsx            entry point
-├── app/                shell: providers, router, route table, not-found page
+├── main.tsx              entry point
+├── app/                  providers, query client, route table, route guards, not-found page
 ├── features/
-│   ├── auth/           login, session, logout                     (planned)
-│   └── requests/       list, details, new request                 (planned)
+│   ├── auth/             login page, demo users, demo data controls
+│   └── requests/         list, details (+ decision panel), new request form
+│       ├── components/
+│       ├── hooks/        TanStack Query hooks (queries and mutations)
+│       ├── rules/        pure logic (grouping into upcoming / past)
+│       └── service/      api.ts: the only file that calls the mock server
 ├── shared/
-│   └── components/     AppPage layout; reusable UI components
-├── mock-server/        the pretend backend, kept apart from the app (planned)
-└── theme/              global stylesheet and Ionic colour variables
+│   ├── api/              ApiError (typed error codes)
+│   ├── components/       AppPage layout, EmptyState, ErrorState, StatusBadge, RoleLabel
+│   ├── schema/           newRequestSchema (Zod), used by the form and the server
+│   ├── session/          current user, logout, header account menu
+│   ├── types/            User, TimeOffRequest, labels
+│   ├── utils/            dates (working days, formatting)
+│   └── permissions.ts    roles → permissions, can(user, permission)
+├── mock-server/          the pretend backend: handlers, seed data, storage, session
+├── test/                 renderWithProviders helper
+└── theme/                global stylesheet and Ionic colour variables (light and dark)
 ```
 
 ## Routes and access
 
-| Route           | Screen                    | Access                                                               |
-| --------------- | ------------------------- | -------------------------------------------------------------------- |
-| `/login`        | Log in (pick a demo user) | Public                                                               |
-| `/requests`     | Request list              | Logged in                                                            |
-| `/requests/new` | New request               | Logged in + permission to create _(planned)_                         |
-| `/requests/:id` | Request details           | Logged in; the mock server checks access to that request _(planned)_ |
-| `/`             | → `/login`                |                                                                      |
-| anything else   | Page not found            |                                                                      |
+| Route           | Screen          | Access                                                                    |
+| --------------- | --------------- | ------------------------------------------------------------------------- |
+| `/login`        | Log in          | Public; logged-in users are sent to `/requests`                           |
+| `/requests`     | Request list    | Logged in                                                                 |
+| `/requests/new` | New request     | Logged in + `request:create` (employees)                                  |
+| `/requests/:id` | Request details | Logged in; the mock server answers "not found" for someone else's request |
+| `/`             | → `/login`      |                                                                           |
+| anything else   | Page not found  |                                                                           |
 
 - Routes live in `IonRouterOutlet` (Ionic's page stack: native transitions, swipe back, previous pages stay mounted).
-- Every page renders the shared `AppPage` (header, optional back button, content), because each page in Ionic's stack needs its own header.
-- **Access is checked in three places from one permissions config** _(planned)_: route guards, components (show or hide actions), and the mock server (refuses anyway). The front end hides; the server enforces.
+- Guards: `RequireAuth`, `RedirectIfLoggedIn`, `RequirePermission`.
+- **Access is checked in three places from one permissions config:** route guards, components (show or hide actions) and the mock server (refuses anyway). The front end hides; the server enforces.
 
 ## Data flow
 
-```text
-Screen → TanStack Query hook → feature api.ts → mock server → localStorage
+```mermaid
+flowchart LR
+  subgraph UI["Screens (features/*)"]
+    P["Pages and components"]
+  end
+  subgraph Q["TanStack Query"]
+    H["Query and mutation hooks<br/>(hooks/queries.ts)"]
+    C[("Query cache")]
+  end
+  subgraph S["Service layer"]
+    A["service/api.ts"]
+  end
+  subgraph M["Mock server"]
+    HD["Handlers<br/>(session check, permissions,<br/>Zod validation, rules)"]
+    LS[("localStorage<br/>time-off-db + session")]
+  end
+
+  P -->|"useRequests(), useDecideRequest() …"| H
+  H <--> C
+  H -->|"queryFn / mutationFn"| A
+  A -->|"async call, 500 ms delay"| HD
+  HD <--> LS
+  HD -.->|"data or ApiError<br/>(UNAUTHENTICATED, FORBIDDEN,<br/>NOT_FOUND, CONFLICT, VALIDATION)"| A
 ```
 
-- **TanStack Query** owns server data: caching, loading and error states, invalidation after writes.
-- **Defaults:** data stays fresh for 5 minutes (instant back navigation); it refetches whenever the user returns to the app; reads retry once, writes never retry automatically.
-- **React Context** holds only the session (who's logged in) _(planned)_.
-- After every write, the affected queries are invalidated, so lists and details refresh.
+**Example: a supervisor approves a request**
+
+```mermaid
+sequenceDiagram
+  actor Sup as Supervisor
+  participant Panel as DecisionPanel
+  participant Hook as useDecideRequest
+  participant Server as decideRequest (mock server)
+  participant Cache as Query cache
+
+  Sup->>Panel: Approve → confirm
+  Panel->>Hook: mutate({ status: 'approved', note })
+  Hook->>Server: decideRequest(id, input)
+  Server->>Server: session → user, may decide?, exists?, not own?, still pending?
+  Server-->>Hook: decided request (or CONFLICT)
+  Hook->>Cache: invalidate ['time-off-requests'] (list + details)
+  Cache-->>Panel: refetched: status "Approved", panel gone
+  Panel-->>Sup: toast "Request approved"
+```
+
+- **TanStack Query owns server data:** caching, loading and error states, invalidation after writes. There's no React Context; **the session is server state** too (`useCurrentUser` asks the mock server "who am I?", like `GET /me`).
+- **Query keys:** `['time-off-requests']` for the list, `['time-off-requests', id]` for details, so one invalidation refreshes both.
+- **Defaults:** data stays fresh for 5 minutes (instant back navigation); refetch whenever the window gets focus; reads retry once, except an `ApiError` (the server's real answer: retrying can't change it); writes never retry.
+- **Ionic's page stack** keeps previous pages mounted, so freshness comes from invalidation and focus refetches, not from remounting.
 
 ## Mock server
 
-_(planned, built epic by epic)_
-
-- Plays the backend: async functions with a short delay, data in localStorage, seeded on first run.
-- Validates input, checks permissions and ownership, and returns typed errors (unauthenticated, forbidden, not found, conflict, validation).
-- Submitting a request carries an idempotency key, so a double tap can't create two requests.
-- With a real backend, it's deleted and each feature's `api.ts` calls `fetch` instead.
+- Plays the backend: async functions with a 500 ms delay, data in localStorage, seeded with sample requests on first run.
+- **Identifies the caller from the session**, never from data the client sends.
+- Checks permissions, ownership and business rules; validates input with the **same Zod schema as the form**; returns typed errors.
+- Rules it enforces: employees see only their own requests (someone else's is "not found", so its existence isn't revealed); only supervisors decide; nobody decides their own request; a decision is final (`CONFLICT` on a second one); new requests can't overlap the employee's pending or approved requests (`CONFLICT`).
+- **Demo data controls** on the login page: "Reset sample data" and "Start empty" (users are always kept).
+- With a real backend, the mock server is deleted and each feature's `service/api.ts` calls `fetch` instead; nothing else changes.
 
 ## Screens
 
-- **Login:** demo users to tap (employee, supervisor).
-- **Request list:** employee: own requests, Upcoming / Past; supervisor: everyone's, Pending / Decided.
-- **Request details:** dates, working days, type, notes, status; Approve / Reject for the supervisor on pending requests.
-- **New request:** dates, type, optional note, validation, working-day count.
+- **Login:** demo users to tap (two employees, one supervisor), role shown in colour; demo data controls.
+- **Request list:** Upcoming / Past switch with counts. Employees see their own requests and a "Request time off" button; the supervisor sees everyone's, with names.
+- **Request details:** status, type, working days, dates, note, submitted date; the decision (who, when, note) once decided; for the supervisor on a pending request, the decision panel (note, Approve, Reject, both confirmed).
+- **New request:** type, from/to dates (native pickers), optional note; live working-day count; errors under the fields.
 
 ## Cross-cutting concerns
 
-Where each concern is handled in the structure:
-
-| Concern                             | Where it's handled                                                                                             |
-| ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **Loading, empty and error states** | Query hooks expose them; every list and action shows them. "Saved" appears only after the mock server confirms |
-| **Access control**                  | One permissions config, used by route guards, components and the mock server _(planned)_                       |
-| **Double submits**                  | Buttons disabled while saving; the mock server ignores a repeated idempotency key _(planned)_                  |
-| **Validation**                      | One Zod schema per form, shared by the form and the mock server _(planned)_                                    |
-| **Accessibility**                   | Ionic components and native elements, labelled inputs, status shown as text, announced results                 |
-| **Responsive layout**               | Mobile-first Ionic layout; on wide screens a centred, max-width column                                         |
-| **Theming**                         | Ionic CSS variables in `theme/`; light and dark follow the system                                              |
-| **Testing**                         | Pure rules and the mock server with unit tests; components and flows with React Testing Library                |
-
-## Key decisions and trade-offs
-
-- **Features by capability, not by role:** one set of screens; permissions decide the differences. _Trade-off:_ components check permissions instead of being role-specific.
-- **TanStack Query for a mocked API:** caching, states and invalidation without hand-written code; swapping in a real API changes only `api.ts`. _Trade-off:_ one more dependency.
-- **Context only for the session:** it rarely changes, so no state library. _Would change if_ frequently changing shared client state appeared.
-- **A header per page (`AppPage`), not a layout route:** Ionic's stack animates each page's own header. _Trade-off:_ every page renders the wrapper.
-- **The mock server enforces rules:** permissions, ownership, final decisions, idempotency, as a real backend would. _Trade-off:_ more code than a JSON file, but the UI is tested against realistic behaviour.
-- **No delete:** requests are records; decisions are history.
+| Concern                             | Where it's handled                                                                                                |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| **Loading, empty and error states** | Every screen: skeletons, empty states, errors with "Try again"; "not found" without retry                         |
+| **Access control**                  | `permissions.ts`, used by route guards, components and the mock server                                            |
+| **Double submits**                  | Buttons and fields disabled while saving; a spinner or "Sending…" in the pressed button; `CONFLICT` on the server |
+| **Validation**                      | One Zod schema (`shared/schema`), shared by the form and the mock server; overlap checked on the server           |
+| **Concurrent changes**              | A second decision gets `CONFLICT`; the page refetches and shows what really happened                              |
+| **Dates**                           | Calendar dates stored as `YYYY-MM-DD` (local), moments as ISO (UTC); working days Monday–Friday                   |
+| **Accessibility**                   | Ionic components and native elements, labelled fields, status as text, hidden labels for icon rows, live regions  |
+| **Responsive layout**               | Mobile-first; on wide screens a centred 640 px column; iOS and Material modes                                     |
+| **Theming**                         | Ionic CSS variables in `theme/`; light and dark follow the system                                                 |
+| **Testing**                         | Pure rules, the schema and the mock server with unit tests; pages with React Testing Library                      |
