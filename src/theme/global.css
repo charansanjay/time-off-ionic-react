@@ -38,3 +38,12 @@
   white-space: nowrap;
   border: 0;
 }
+
+/* Toasts: neutral background, coloured icon */
+ion-toast.toast-success::part(icon) {
+  color: var(--ion-color-success);
+}
+
+ion-toast.toast-error::part(icon) {
+  color: var(--ion-color-danger);
+}

@@ -1,5 +1,5 @@
 ion-list.list:global(.list-inset) {
-  margin-top: 0;
+  margin-top: 8px;
   padding-top: 0;
   padding-bottom: 0;
 }
