@@ -32,6 +32,10 @@
   color: var(--ion-color-medium);
 }
 
+.listHeader {
+  font-size: 1rem;
+}
+
 .note {
   display: block;
   text-align: center;

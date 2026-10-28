@@ -10,6 +10,7 @@ import type { User } from '../../shared/types/user';
 import { UserList } from './components/UserList';
 import { ErrorState } from '../../shared/components/ui/ErrorState';
 import { UserListSkeleton } from './components/UserListSkeleton';
+import { DemoDataActions } from './components/DemoDataActions';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -53,7 +54,7 @@ export const LoginPage = () => {
 
         {demoUsers.isSuccess && (
           <>
-            <IonListHeader id="user-list-heading">
+            <IonListHeader id="user-list-heading" className={styles.listHeader}>
               <IonLabel>Choose a demo user</IonLabel>
             </IonListHeader>
             <UserList
@@ -66,6 +67,8 @@ export const LoginPage = () => {
         )}
 
         {login.isError && <ErrorState message="Couldn't log in. Please try again." />}
+
+        <DemoDataActions />
 
         <IonNote className={styles.note}>
           <strong>This is a demo</strong> (no password needed. You stay logged in until you log

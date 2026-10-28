@@ -10,6 +10,10 @@ vi.mock('./service/api', () => ({
   authApi: { getDemoUsers: vi.fn(), login: vi.fn() },
 }));
 
+vi.mock('./service/api', () => ({
+  authApi: { getDemoUsers: vi.fn(), login: vi.fn(), resetDemoData: vi.fn() },
+}));
+
 const [employee] = SEED_USERS;
 
 beforeEach(() => {
