@@ -1,3 +1,13 @@
+:global(.ios) .form ion-input,
+:global(.ios) .form ion-select,
+:global(.ios) .form ion-textarea {
+  --background: var(--ion-item-background);
+  --padding-start: 12px;
+  --padding-end: 12px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
 .form {
   display: flex;
   flex-direction: column;

@@ -31,7 +31,7 @@ export const CurrentUser = () => {
         color="primary"
         fill="clear"
       >
-        <IonIcon slot="icon-only" icon={personCircleOutline} />
+        <IonIcon slot="icon-only" icon={personCircleOutline} aria-hidden="true" />
       </IonButton>
 
       <IonPopover trigger={triggerId} triggerAction="click">
