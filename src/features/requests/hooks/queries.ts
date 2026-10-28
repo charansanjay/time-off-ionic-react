@@ -27,6 +27,6 @@ export const useDecideRequest = (id: string) => {
   return useMutation({
     mutationFn: (input: DecisionInput) => requestApi.decideRequest(id, input),
 
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: requestKeys.list }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: requestKeys.list }),
   });
 };
