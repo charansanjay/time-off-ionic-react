@@ -1,7 +1,8 @@
+import { format, addDays } from 'date-fns';
 import { SEED_REQUESTS } from '../seed';
 import { readStorage } from '../storage';
 import { login } from './auth';
-import { decideRequest, getTimeOffRequest, getTimeOffRequests } from './requests';
+import { createRequest, decideRequest, getTimeOffRequest, getTimeOffRequests } from './requests';
 
 vi.mock('../simulate', () => ({ delay: () => Promise.resolve() }));
 
@@ -119,5 +120,71 @@ describe('decideRequest', () => {
     await expect(decideRequest('req-1', { status: 'approved' })).rejects.toMatchObject({
       code: 'UNAUTHENTICATED',
     });
+  });
+});
+
+describe('createRequest', () => {
+  // 2099-11-02 is a Monday: far in the future, clear of every seed request
+  const newRequest = {
+    type: 'vacation',
+    startDate: '2099-11-02',
+    endDate: '2099-11-06',
+    note: '  Family trip  ',
+  } as const;
+
+  // The seed's dates are relative to today, so compute them the same way
+  const daysFromToday = (days: number) => format(addDays(new Date(), days), 'yyyy-MM-dd');
+
+  it('saves a pending request for the logged-in employee', async () => {
+    await login('user-employee-1');
+
+    const result = await createRequest(newRequest);
+
+    expect(result).toMatchObject({
+      employeeId: 'user-employee-1',
+      employeeName: 'Charan Sanjay',
+      status: 'pending',
+      note: 'Family trip',
+    });
+
+    // The side effect: it's really saved
+    const saved = readStorage().requests.find((r) => r.id === result.id);
+    expect(saved?.status).toBe('pending');
+  });
+
+  it('refuses a supervisor', async () => {
+    await login('user-supervisor-1');
+    await expect(createRequest(newRequest)).rejects.toMatchObject({ code: 'FORBIDDEN' });
+  });
+
+  it('refuses invalid input, with the reason', async () => {
+    await login('user-employee-1');
+    await expect(createRequest({ ...newRequest, endDate: '2099-11-01' })).rejects.toMatchObject({
+      code: 'VALIDATION',
+      message: "The end date can't be before the start date",
+    });
+  });
+
+  it('refuses days that overlap a pending or approved request', async () => {
+    await login('user-employee-1');
+    // req-1 (pending) runs from day 10 to day 14; this starts inside it
+    await expect(
+      createRequest({ ...newRequest, startDate: daysFromToday(12), endDate: daysFromToday(20) }),
+    ).rejects.toMatchObject({ code: 'CONFLICT' });
+  });
+
+  it('allows the same days as a rejected request', async () => {
+    await login('user-employee-1');
+    // req-3 (rejected) runs from day 45 to day 49
+    const result = await createRequest({
+      ...newRequest,
+      startDate: daysFromToday(45),
+      endDate: daysFromToday(49),
+    });
+    expect(result.status).toBe('pending');
+  });
+
+  it('rejects when nobody is logged in', async () => {
+    await expect(createRequest(newRequest)).rejects.toMatchObject({ code: 'UNAUTHENTICATED' });
   });
 });

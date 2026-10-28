@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { requestApi } from '../service/api';
 import type { DecisionInput } from '../../../shared/types/request';
+import { type NewRequestInput } from '../../../shared/schema/newRequestSchema';
 
 export const requestKeys = {
   list: ['time-off-requests'] as const,
@@ -28,5 +29,15 @@ export const useDecideRequest = (id: string) => {
     mutationFn: (input: DecisionInput) => requestApi.decideRequest(id, input),
 
     onSettled: () => queryClient.invalidateQueries({ queryKey: requestKeys.list }),
+  });
+};
+
+export const useCreateRequest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: NewRequestInput) => requestApi.createRequest(input),
+    // Only a success changes the server's data; a failed create leaves nothing to refresh
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: requestKeys.list }),
   });
 };

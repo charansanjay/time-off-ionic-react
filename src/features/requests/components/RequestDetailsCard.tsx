@@ -14,7 +14,7 @@ import {
   TYPE_LABELS,
   type TimeOffType,
 } from '../../../shared/types/request';
-import { countWorkingDays, formatDateRange, formatDateTime } from '../rules/dates';
+import { countWorkingDays, formatDateRange, formatDateTime } from '../../../shared/utils/dates';
 import { DetailRow } from './DetailRow';
 import { StatusBadge } from '../../../shared/components/ui/StatusBadge';
 

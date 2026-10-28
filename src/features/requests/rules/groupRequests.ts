@@ -1,5 +1,5 @@
 import type { RequestListItem } from '../../../shared/types/request';
-import { todayString } from './dates';
+import { todayString } from '../../../shared/utils/dates';
 
 export const groupRequests = (requests: RequestListItem[], today = todayString()) => ({
   // Still running or in the future, soonest first
