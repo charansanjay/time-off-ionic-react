@@ -70,7 +70,7 @@ export const LoginPage = () => {
 
         <DemoDataActions />
 
-        <IonNote className={styles.note}>
+        <IonNote color="medium" className={styles.note}>
           <strong>This is a demo</strong> (no password needed. You stay logged in until you log
           out.)
         </IonNote>

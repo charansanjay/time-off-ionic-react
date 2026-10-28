@@ -1,4 +1,4 @@
-export const SESSION_KEY = 'tile-off-session';
+export const SESSION_KEY = 'time-off-session';
 
 export type Session = {
   userId: string;

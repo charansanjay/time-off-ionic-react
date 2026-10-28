@@ -3,7 +3,7 @@ import { IonText } from '@ionic/react';
 import type { Role } from '../../types/user';
 
 const ROLE_COLORS: Record<Role, string> = {
-  employee: 'warning',
+  employee: 'primary',
   supervisor: 'tertiary',
 };
 

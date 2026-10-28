@@ -1,4 +1,4 @@
-import { IonItem, IonLabel } from '@ionic/react';
+import { IonItem, IonLabel, IonText } from '@ionic/react';
 import { countWorkingDays, formatDateRange } from '../../../shared/utils/dates';
 import { TYPE_LABELS, type RequestListItem } from '../../../shared/types/request';
 import { StatusBadge } from '../../../shared/components/ui/StatusBadge';
@@ -20,7 +20,9 @@ export const RequestCard = ({ request, showEmployeeName }: RequestCardProps) => 
           {formatDateRange(request.startDate, request.endDate)}
         </h2>
         <p>
-          {days} {days === 1 ? 'working day' : 'working days'} · {TYPE_LABELS[request.type]}
+          <IonText color="medium">
+            {days} {days === 1 ? 'working day' : 'working days'} · {TYPE_LABELS[request.type]}
+          </IonText>
         </p>
       </IonLabel>
       <StatusBadge status={request.status} />
