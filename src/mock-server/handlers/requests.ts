@@ -8,6 +8,7 @@ import type {
   TimeOffRequest,
 } from '../../shared/types/request';
 import type { User } from '../../shared/types/user';
+import { formatDateRange } from '../../shared/utils/dates';
 import { readSession } from '../session';
 import { delay } from '../simulate';
 import { readStorage, writeStorage } from '../storage';
@@ -116,11 +117,14 @@ export const createRequest = async (input: NewRequestInput) => {
   const { type, startDate, endDate, note } = parsed.data;
 
   // Rejected requests don't block: the employee may ask for the same days again.
-  const clash = data.requests.some(
+  const clash = data.requests.find(
     (r) => r.employeeId === user.id && r.status !== 'rejected' && overlaps(r, startDate, endDate),
   );
   if (clash) {
-    throw new ApiError('CONFLICT', 'You already have time off on some of these days');
+    throw new ApiError(
+      'CONFLICT',
+      `You already have time off on ${formatDateRange(clash.startDate, clash.endDate)}`,
+    );
   }
 
   const request: TimeOffRequest = {
