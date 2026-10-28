@@ -53,7 +53,7 @@ export const LoginPage = () => {
 
         {demoUsers.isSuccess && (
           <>
-            <IonListHeader id="user-list-heading">
+            <IonListHeader id="user-list-heading" className={styles.listHeader}>
               <IonLabel>Choose a demo user</IonLabel>
             </IonListHeader>
             <UserList
