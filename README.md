@@ -12,7 +12,7 @@ Built in small steps, like a team project: **GitHub issues** (epics and stories 
 - **Bonus:**
   - form validation ✅
   - tests ✅ (unit and integration: 128, 96% line coverage)
-  - Storybook **not included**
+  - Storybook: **not included** (the reusable components live in `src/shared/components`, used by the `auth` and `requests` features)
 
 ## Contents
 
