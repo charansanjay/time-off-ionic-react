@@ -29,7 +29,6 @@ const EMPTY_FORM: FormValues = { type: '', startDate: '', endDate: '', note: '' 
 
 type FieldErrors = Partial<Record<keyof FormValues, string[]>>;
 
-// The schema's messages per field, e.g. { endDate: ["The end date can't be before…"] }
 const fieldErrorsOf = (values: FormValues): FieldErrors => {
   const result = newRequestSchema.safeParse(values);
   return result.success ? {} : z.flattenError(result.error).fieldErrors;
@@ -82,7 +81,6 @@ export const NewRequestForm = () => {
     });
   };
 
-  // The live count, once both dates are set and in the right order
   const workingDays =
     values.startDate && values.endDate && values.endDate >= values.startDate
       ? countWorkingDays(values.startDate, values.endDate)

@@ -9,6 +9,6 @@ const STATUS_COLORS: Record<TimeOffStatus, string> = {
 
 type StatusBadgeProps = { status: TimeOffStatus };
 
-export const StatusBadge = ({ status }: StatusBadgeProps) => {
-  return <IonBadge color={STATUS_COLORS[status]}>{STATUS_LABELS[status]}</IonBadge>;
-};
+export const StatusBadge = ({ status }: StatusBadgeProps) => (
+  <IonBadge color={STATUS_COLORS[status]}>{STATUS_LABELS[status]}</IonBadge>
+);

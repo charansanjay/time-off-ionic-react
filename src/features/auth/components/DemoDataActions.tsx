@@ -6,7 +6,6 @@ import type { DemoDataMode } from '../service/api';
 
 import styles from './DemoDataActions.module.css';
 
-// Demo only: a reviewer can bring back the sample requests or start with none
 export const DemoDataActions = () => {
   const reset = useResetDemoData();
   const [presentToast] = useIonToast();
