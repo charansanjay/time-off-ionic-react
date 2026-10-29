@@ -8,7 +8,6 @@ export const UserListSkeleton = () => {
       {[1, 2].map((item) => (
         <IonItem key={item}>
           <IonSkeletonText slot="start" animated className={styles.avatarSkeleton} />
-
           <IonLabel>
             <IonSkeletonText animated style={{ width: '60%' }} />
             <IonSkeletonText animated style={{ width: '30%' }} />

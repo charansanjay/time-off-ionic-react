@@ -34,7 +34,6 @@ export const UserList = ({ demoUsers, disabled, onLogin, loggingInUserId }: User
               icon={personCircleOutline}
               className={styles.icon}
             />
-
             <IonLabel>
               <h2>{user.name}</h2>
               <p>
