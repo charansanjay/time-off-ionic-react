@@ -8,6 +8,5 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   supervisor: ['request:read:all', 'request:decide'],
 };
 
-export const can = (user: User | null | undefined, permission: Permission): boolean => {
-  return !!user && ROLE_PERMISSIONS[user.role].includes(permission);
-};
+export const can = (user: User | null | undefined, permission: Permission): boolean =>
+  !!user && ROLE_PERMISSIONS[user.role].includes(permission);

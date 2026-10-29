@@ -6,10 +6,18 @@ A mobile-first app where employees request time off and supervisors approve or r
 
 Built in small steps, like a team project: **GitHub issues** (epics and stories with acceptance criteria), **feature branches and pull requests**, **conventional commits**, **CI with GitHub Actions** and **automatic deploys to Netlify**.
 
+**Brief coverage:**
+
+- All required features ✅
+- **Bonus:**
+  - form validation ✅
+  - tests ✅ (unit and integration: 128, 96% line coverage)
+  - Storybook **not included**
+
 ## Contents
 
-- [Try it](#try-it)
-- [Getting started](#getting-started)
+- [Try the live demo](#try-the-live-demo)
+- [How to run the app](#how-to-run-the-app)
 - [Features](#features)
 - [Tech stack](#tech-stack)
 - [Architecture](#architecture)
@@ -19,7 +27,9 @@ Built in small steps, like a team project: **GitHub issues** (epics and stories 
 - [Not built and next steps](#not-built-and-next-steps)
 - [Use of AI](#use-of-ai)
 
-## Try it
+## Try the live demo
+
+**Live demo:** <https://time-off-ionic-react.netlify.app>
 
 - **Best on a real phone:** open the live demo on your phone to see the native date pickers, action sheets and iOS / Android styling.
 - **On a computer:** use the browser's device mode. Ionic picks the iOS or Material style from the device (reload after switching, or add `?ionic:mode=ios` / `?ionic:mode=md` to the URL).
@@ -37,7 +47,7 @@ Built in small steps, like a team project: **GitHub issues** (epics and stories 
 - **Demo data** (under the user list): **Reset sample data** brings the sample requests back; **Start empty** removes all requests so you can start from scratch. Data lives in your browser's localStorage.
 - Every call to the mock server waits **500 ms**, so the loading states are visible.
 
-## Getting started
+## How to run the app
 
 **Requirements:** Node.js 24 (see `.nvmrc`) and npm.
 
@@ -78,6 +88,16 @@ All scripts are in `package.json`. **CI (GitHub Actions)** runs lint, format che
 - **Responsive:** phone, tablet and desktop (a centred column on wide screens).
 - Loading, empty and error states on every screen.
 
+## Assumptions
+
+- Request length is counted in **working days** (Monday–Friday); public holidays are not considered.
+- Start and end dates are **inclusive**; a one-day request has the same start and end date.
+- **Sick leave** may start in the past (it's often reported afterwards); other types can't.
+- There is **one supervisor**, who sees everyone's requests (no teams).
+- There are **no leave balances**: any number of days can be requested.
+- A new request can't overlap the employee's pending or approved requests; rejected ones don't count.
+- **Decisions are final**, and requests can't be edited, cancelled or deleted.
+
 ## Tech stack
 
 | Tool                       | Why                                                                                        |
@@ -117,7 +137,9 @@ Each layer is tested at its own level:
 - **Pages** (React Testing Library, mocked API): loading, empty, error and not-found states; what each role sees; the Upcoming / Past switch; deciding with confirmation and the conflict case; the form's validation, success and overlap.
 - **Route guards** with stand-in pages.
 
-Some Ionic components don't fire their events in jsdom; those tests replace only the affected components or hooks with small fakes that keep the same contract (documented in each test file).
+**Next:** end-to-end tests with Playwright for the main flows (an employee requests time off, a supervisor approves it).
+
+Ionic's form controls and overlays don't fire their events in jsdom, so a few tests swap just those parts for small fakes with the same contract; the app's logic is still tested for real.
 
 ## Quality checks
 
@@ -132,16 +154,6 @@ Some Ionic components don't fire their events in jsdom; those tests replace only
 | **Build & deployment** | CI on every push and pull request (lint, format, type-check, tests, build); Netlify deploys `main` to production and builds a preview for every pull request                                                             |
 
 Measured on the production build. Lazy-loading the routes was tried, saved only about 3%, and was reverted because it conflicts with Ionic's page transitions.
-
-## Assumptions
-
-- Request length is counted in **working days** (Monday–Friday); public holidays are not considered.
-- Start and end dates are **inclusive**; a one-day request has the same start and end date.
-- **Sick leave** may start in the past (it's often reported afterwards); other types can't.
-- There is **one supervisor**, who sees everyone's requests (no teams).
-- There are **no leave balances**: any number of days can be requested.
-- A new request can't overlap the employee's pending or approved requests; rejected ones don't count.
-- **Decisions are final**, and requests can't be edited, cancelled or deleted.
 
 ## Not built and next steps
 
